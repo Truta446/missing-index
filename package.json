@@ -1,0 +1,64 @@
+{
+  "name": "missing-index",
+  "version": "0.1.0",
+  "description": "Find the missing database index. Explains your slow queries at runtime and prints the CREATE INDEX to fix them, with the line of code that ran them.",
+  "keywords": [
+    "index",
+    "missing-index",
+    "postgres",
+    "postgresql",
+    "explain",
+    "seq-scan",
+    "performance",
+    "slow-query",
+    "database",
+    "query",
+    "optimization",
+    "drizzle",
+    "knex",
+    "typeorm",
+    "prisma"
+  ],
+  "license": "MIT",
+  "author": "Juan Versolato <juan.versolato@outlook.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Truta446/missing-index.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Truta446/missing-index/issues"
+  },
+  "homepage": "https://github.com/Truta446/missing-index#readme",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./pg": {
+      "types": "./dist/adapters/pg.d.ts",
+      "import": "./dist/adapters/pg.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "tsc -p tsconfig.json && node --test \"dist-test/test/*.test.js\"",
+    "typecheck": "tsc --noEmit",
+    "coverage": "tsc -p tsconfig.json && node --test --experimental-test-coverage \"dist-test/test/*.test.js\"",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/pg": "^8.21.0",
+    "pg": "^8.23.0",
+    "typescript": "^5.7.0"
+  }
+}
