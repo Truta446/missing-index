@@ -1,12 +1,12 @@
 <div align="center">
 
-# missing-index
+<img src="https://raw.githubusercontent.com/Truta446/missing-index/main/assets/banner.png" alt="missing-index — find the index your slow query is missing, and get the CREATE INDEX that fixes it" width="880">
 
-### Find the index your slow query is missing — and get the `CREATE INDEX` that fixes it.
+# missing-index
 
 [![npm version](https://img.shields.io/npm/v/missing-index?style=flat-square&color=cb3837)](https://www.npmjs.com/package/missing-index)
 [![license](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](./LICENSE)
-[![node](https://img.shields.io/badge/node-%3E%3D18-339933?style=flat-square)](https://nodejs.org)
+[![node](https://img.shields.io/badge/node-18%20%7C%2020%20%7C%2022%20%7C%2024-339933?style=flat-square)](https://nodejs.org)
 [![dependencies](https://img.shields.io/badge/dependencies-0-success?style=flat-square)](./package.json)
 
 Companion to [nplusone](https://github.com/Truta446/nplusone).<br/>
@@ -32,6 +32,12 @@ That is real output, not a mockup — 60,000 rows read to return 12.
 ```sh
 npm install --save-dev missing-index
 ```
+
+Tested on Node **18, 20, 22 and 24**.
+
+The package is ESM. `import` works on every version above; `require()` works
+from Node 20.19 onwards, which is where Node backported requiring an ES module.
+On Node 18 — end-of-life since April 2025 — use `import`.
 
 ## Use
 

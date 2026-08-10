@@ -1,6 +1,6 @@
 {
   "name": "missing-index",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Find the missing database index. Explains your slow queries at runtime and prints the CREATE INDEX to fix them, with the line of code that ran them.",
   "keywords": [
     "index",
@@ -40,11 +40,15 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./pg": {
       "types": "./dist/adapters/pg.d.ts",
-      "import": "./dist/adapters/pg.js"
+      "import": "./dist/adapters/pg.js",
+      "require": "./dist/adapters/pg.js",
+      "default": "./dist/adapters/pg.js"
     },
     "./package.json": "./package.json"
   },
