@@ -50,9 +50,9 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "test": "tsc -p tsconfig.json && node --test \"dist-test/test/*.test.js\"",
+    "test": "tsc -p tsconfig.json && node --test dist-test/test/*.test.js",
     "typecheck": "tsc --noEmit",
-    "coverage": "tsc -p tsconfig.json && node --test --experimental-test-coverage \"dist-test/test/*.test.js\"",
+    "coverage": "tsc -p tsconfig.json && node --test --experimental-test-coverage dist-test/test/*.test.js",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
