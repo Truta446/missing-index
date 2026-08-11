@@ -1,0 +1,60 @@
+name: Bug report
+description: A suggestion is wrong, missing, or the tool crashed
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing: if **nothing is ever suggested**, the two usual causes are
+        `thresholdMs` (fast queries are never explained, by design) and `minRows`
+        (small tables are skipped, because scanning them really is cheaper than
+        indexing them). Try `configure({ thresholdMs: 0, minRows: 1 })` to confirm
+        the instrumentation is working at all.
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What happened
+      options:
+        - A missing index was not suggested
+        - An index was suggested that would not help
+        - The suggested columns or their order look wrong
+        - The reported line of code is wrong or missing
+        - Crash or error
+    validations:
+      required: true
+
+  - type: input
+    id: database
+    attributes:
+      label: Database and version
+      placeholder: "PostgreSQL 16.2"
+    validations:
+      required: true
+
+  - type: input
+    id: driver
+    attributes:
+      label: Driver / ORM and version
+      placeholder: "pg 8.16.3 + Drizzle 0.45.2"
+    validations:
+      required: true
+
+  - type: textarea
+    id: plan
+    attributes:
+      label: The query and its plan
+      description: >
+        Run `EXPLAIN (FORMAT JSON) <your query>` and paste the output. This is the
+        single most useful thing you can include — the analysis works entirely
+        from that plan, so with it the problem is usually reproducible without
+        your database.
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you got vs what you expected
+      render: text

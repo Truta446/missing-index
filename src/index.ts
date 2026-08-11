@@ -18,11 +18,15 @@
  */
 
 export { configure, getOptions, resetConfig } from "./config.js";
-export { inspect, type InspectInput } from "./detect.js";
-export { analyzePlan, buildStatement, type AnalyzeOptions } from "./analyze.js";
+export { inspect, type InspectInput, type Runner } from "./detect.js";
+export { analyzeScans, type AnalyzeOptions } from "./analyze.js";
 export { columnsInCondition, orderForIndex, type ConditionColumn, type Comparison } from "./conditions.js";
-export { explainStatement, isExplainable, type Explainer } from "./explain.js";
-export { extractPlan, walk } from "./plan.js";
+export { postgres } from "./dialects/postgres.js";
+export { mysql } from "./dialects/mysql.js";
+export type { Dialect } from "./dialects/types.js";
+export { extractPlan, walk, rowsOf, type ScanNode } from "./plan.js";
+export { runWithCallSite, ambientCallSite } from "./callsite-context.js";
+export { settled } from "./inflight.js";
 export { formatFinding, defaultReporter } from "./report.js";
 export { captureCallSite, formatCallSite } from "./callsite.js";
 
@@ -30,7 +34,7 @@ export type {
   CallSite,
   Finding,
   Options,
-  PlanNode,
+  PgPlanNode,
   ResolvedOptions,
   Suggestion,
 } from "./types.js";

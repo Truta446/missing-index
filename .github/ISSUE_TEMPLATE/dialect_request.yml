@@ -1,0 +1,35 @@
+name: Database support
+description: Ask for a database we do not cover yet
+labels: [dialect]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The analysis is database-agnostic — it works from a parsed plan. Adding a
+        database means writing a dialect: how to ask for a plan, how to read it,
+        how to find the table sizes, and how to phrase a safe `CREATE INDEX`.
+        See `src/dialects/` for the two that exist.
+
+  - type: input
+    id: database
+    attributes:
+      label: Which database
+      placeholder: "MariaDB 11 / SQLite / CockroachDB"
+    validations:
+      required: true
+
+  - type: textarea
+    id: plan
+    attributes:
+      label: What its EXPLAIN output looks like
+      description: The plan for a query doing a full table scan, if you have one.
+      render: text
+
+  - type: input
+    id: concurrent
+    attributes:
+      label: Can it build an index without locking writes?
+      description: >
+        PostgreSQL has CREATE INDEX CONCURRENTLY; MySQL has ALGORITHM=INPLACE,
+        LOCK=NONE. A suggestion must never tell someone to lock a live table.
+      placeholder: "yes / no / not sure"

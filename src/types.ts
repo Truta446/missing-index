@@ -1,7 +1,7 @@
 import type { Suggestion } from "./analyze.js";
 
 export type { Suggestion } from "./analyze.js";
-export type { PlanNode } from "./plan.js";
+export type { PgPlanNode, ScanNode } from "./plan.js";
 
 export interface CallSite {
   file: string;
@@ -16,6 +16,8 @@ export interface Finding {
   durationMs: number;
   suggestion: Suggestion;
   callsite: CallSite | undefined;
+  /** Which database this came from, e.g. `postgres`. */
+  dialect: string;
 }
 
 export interface Options {

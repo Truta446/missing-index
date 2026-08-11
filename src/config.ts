@@ -38,6 +38,11 @@ export function getOptions(): ResolvedOptions {
   return currentOptions();
 }
 
+/** Replaces the configuration wholesale, to restore a snapshot. */
+export function restoreConfig(snapshot: ResolvedOptions): ResolvedOptions {
+  return setShared(KEY, snapshot);
+}
+
 export function resetConfig(): ResolvedOptions {
   // Also forget what has been reported, or a suggestion suppressed in one run
   // stays suppressed for the life of the process — which makes the detector

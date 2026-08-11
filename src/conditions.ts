@@ -19,6 +19,17 @@ function stripCasts(text: string): string {
   return text.replace(/::[a-zA-Z_][a-zA-Z0-9_ ]*(\[\])?/g, "");
 }
 
+/**
+ * Removes identifier quoting.
+ *
+ * PostgreSQL quotes with `"`, MySQL with backticks — and MySQL qualifies fully,
+ * so a condition reads ``(`db`.`orders`.`user_id` = 42)``. Dropping the quotes
+ * first lets one pattern read both dialects.
+ */
+function stripIdentifierQuotes(text: string): string {
+  return text.replace(/[`"]/g, "");
+}
+
 /** Removes quoted literals so their contents are never read as columns. */
 function stripLiterals(text: string): string {
   return text.replace(/'(?:[^']|'')*'/g, "'?'");
@@ -44,20 +55,23 @@ function classify(operator: string): Comparison {
  * suboptimal suggestion, not a crash.
  */
 export function columnsInCondition(condition: string): ConditionColumn[] {
-  const text = stripCasts(stripLiterals(condition));
+  const text = stripIdentifierQuotes(stripCasts(stripLiterals(condition)));
   const found = new Map<string, Comparison>();
 
-  // `alias.column <op> …` or `column <op> …`.
+  // Any number of qualifiers, then the column, then the operator:
+  //   user_id =            (unqualified)
+  //   o.user_id =          (aliased, PostgreSQL)
+  //   testdb.orders.user_id =   (fully qualified, MySQL)
   //
   // The `\)?` matters: EXPLAIN wraps a cast column in parentheses, so
   // `((status)::text = 'active')` becomes `((status) = '?')` once the cast is
   // stripped, leaving a bracket between the column and the operator.
   const comparison =
-    /(?:([a-zA-Z_][a-zA-Z0-9_]*)\.)?"?([a-zA-Z_][a-zA-Z0-9_]*)"?\)?\s*(>=|<=|<>|!=|=|>|<|~~\*?|IS(?:\s+NOT)?|IN)\s/gi;
+    /(?:[a-zA-Z_][a-zA-Z0-9_]*\.)*([a-zA-Z_][a-zA-Z0-9_]*)\)?\s*(>=|<=|<>|!=|=|>|<|~~\*?|IS(?:\s+NOT)?|IN)\s/gi;
 
   for (const match of text.matchAll(comparison)) {
-    const column = match[2];
-    const operator = match[3];
+    const column = match[1];
+    const operator = match[2];
     if (column === undefined || operator === undefined) continue;
     if (isKeyword(column)) continue;
 

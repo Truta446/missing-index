@@ -1,7 +1,7 @@
 {
   "name": "missing-index",
-  "version": "0.1.1",
-  "description": "Find the missing database index. Explains your slow queries at runtime and prints the CREATE INDEX to fix them, with the line of code that ran them.",
+  "version": "0.2.0",
+  "description": "Find the missing database index. Explains slow queries at runtime and prints the CREATE INDEX that fixes them, with the line of code that ran them. PostgreSQL and MySQL.",
   "keywords": [
     "index",
     "missing-index",
@@ -17,7 +17,11 @@
     "drizzle",
     "knex",
     "typeorm",
-    "prisma"
+    "prisma",
+    "mysql",
+    "mariadb",
+    "n+1",
+    "ci"
   ],
   "license": "MIT",
   "author": "Juan Versolato <juan.versolato@outlook.com>",
@@ -50,19 +54,43 @@
       "require": "./dist/adapters/pg.js",
       "default": "./dist/adapters/pg.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./mysql2": {
+      "types": "./dist/adapters/mysql2.d.ts",
+      "import": "./dist/adapters/mysql2.js",
+      "require": "./dist/adapters/mysql2.js",
+      "default": "./dist/adapters/mysql2.js"
+    },
+    "./drizzle": {
+      "types": "./dist/adapters/drizzle.d.ts",
+      "import": "./dist/adapters/drizzle.js",
+      "require": "./dist/adapters/drizzle.js",
+      "default": "./dist/adapters/drizzle.js"
+    },
+    "./test": {
+      "types": "./dist/test.d.ts",
+      "import": "./dist/test.js",
+      "require": "./dist/test.js",
+      "default": "./dist/test.js"
+    }
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "test": "tsc -p tsconfig.json && node --test dist-test/test/*.test.js",
     "typecheck": "tsc --noEmit",
     "coverage": "tsc -p tsconfig.json && node --test --experimental-test-coverage dist-test/test/*.test.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "lint": "biome lint src test",
+    "lint:fix": "biome lint --write src test"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.8",
     "@types/node": "^22.10.0",
     "@types/pg": "^8.21.0",
+    "drizzle-orm": "^0.45.2",
+    "mysql2": "^3.23.3",
     "pg": "^8.23.0",
+    "postgres": "^3.4.9",
     "typescript": "^5.7.0"
   }
 }

@@ -52,7 +52,55 @@ instrumentPg(pg);
 
 That is the whole setup. Run your app, use it normally, and anything worth indexing prints itself.
 
-Because it hooks the **driver**, everything on top of `pg` is covered without its own adapter: Drizzle, Knex, TypeORM, Sequelize, Kysely, raw SQL.
+## Compatibility
+
+Because it hooks the **driver**, every query builder and ORM on top of that driver is covered without needing its own adapter.
+
+| Your stack | Setup | |
+| --- | --- | :--: |
+| **PostgreSQL** (`pg`) | `instrumentPg(pg)` | ✅ |
+| **MySQL / MariaDB** (`mysql2`) | `instrumentMysql2(mysql)` | ✅ |
+| **Drizzle** | driver **+** `instrumentDrizzle(db)` | ✅ |
+| **Knex** | via its driver | ✅ |
+| **TypeORM** | via its driver | ✅ |
+| **Sequelize** | via its driver | ✅ |
+| **Kysely** | via its driver | ✅ |
+| raw SQL | via its driver | ✅ |
+
+> **Drizzle needs the extra adapter for one reason:** a Drizzle query is a lazy
+> thenable, so what triggers execution is the runtime calling `.then()`, not
+> your code. By then the caller's frame has left the stack and the suggestion
+> would be reported against nothing. `instrumentDrizzle(db)` captures the call
+> site while the query is still being built. Use both together — the driver
+> reports the SQL, Drizzle reports the line.
+
+```ts
+import mysql from "mysql2";
+import { instrumentMysql2 } from "missing-index/mysql2";
+
+instrumentMysql2(mysql);   // also covers mysql2/promise
+```
+
+MySQL has no `CREATE INDEX CONCURRENTLY`, so its suggestions carry
+`ALGORITHM=INPLACE, LOCK=NONE` — the equivalent promise that the table stays
+writable while the index builds.
+
+## Guarding it in CI
+
+A detector you have to remember to read decays. An assertion does not.
+
+```ts
+import { expectNoMissingIndex } from "missing-index/test";
+
+test("orders page uses its indexes", async () => {
+  await expectNoMissingIndex(() => loadOrdersPage(userId));
+});
+```
+
+It throws a plain `Error`, so Jest, Vitest and `node:test` all report it with no
+plugin. The helper sets `thresholdMs: 0` for you: in a test you want the
+assertion to be about the **plan**, not about how fast the CI runner happened to
+be that morning.
 
 ## What it actually does
 
@@ -95,7 +143,6 @@ Explaining a query costs one extra round trip, which is why `thresholdMs` exists
 
 Worth knowing before filing an issue:
 
-- **PostgreSQL only** right now. MySQL's `EXPLAIN` has a different shape; an adapter is welcome.
 - **It suggests, it does not decide.** An index costs write throughput and disk. On a write-heavy table the suggestion may be the wrong trade — the tool has no way to know that, and says so by printing SQL rather than running it.
 - **The suggestion is never run for you**, on purpose. It comes with `CONCURRENTLY` so it is safe on a live table; a plain `CREATE INDEX` locks writes for its whole duration.
 - **Partial and expression indexes are out of scope.** A filter like `WHERE lower(email) = $1` needs `ON (lower(email))`, and the suggestion will name the column rather than the expression.
@@ -104,7 +151,7 @@ Worth knowing before filing an issue:
 ## Tests
 
 ```sh
-npm test                    # unit tests, no database needed
+npm test                    # 48 tests, no database needed
 MISSING_INDEX_PG=1 npm test # plus integration against a real PostgreSQL
 ```
 

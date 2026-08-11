@@ -15,6 +15,7 @@ import { test, before, after, describe } from "node:test";
 import assert from "node:assert/strict";
 import { configure, resetConfig } from "../src/index.js";
 import { instrumentPgClient } from "../src/adapters/pg.js";
+import { settled } from "../src/inflight.js";
 import type { Finding } from "../src/types.js";
 
 const enabled = process.env["MISSING_INDEX_PG"] !== undefined;
@@ -69,7 +70,7 @@ describe("against a real PostgreSQL", { skip: !enabled }, () => {
     await client.query("SELECT * FROM orders WHERE user_id = $1", [42]);
     // The suggestion is produced after the query resolves, so let the
     // microtask that runs EXPLAIN finish.
-    await new Promise((r) => setTimeout(r, 250));
+    await settled();
 
     assert.equal(findings.length, 1, "expected exactly one suggestion");
     const [finding] = findings;
@@ -89,7 +90,7 @@ describe("against a real PostgreSQL", { skip: !enabled }, () => {
 
     // Highly selective value, so the planner will choose the index.
     await client.query("SELECT * FROM orders WHERE status = $1", ["nonexistent"]);
-    await new Promise((r) => setTimeout(r, 250));
+    await settled();
 
     assert.deepEqual(
       findings.filter((f) => f.suggestion.columns.includes("status")),
@@ -110,7 +111,7 @@ describe("against a real PostgreSQL", { skip: !enabled }, () => {
 
     await client.query("SELECT * FROM orders WHERE user_id = $1", [7]);
     await client.query("SELECT * FROM orders WHERE status = $1 AND user_id > $2", ["paid", 100]);
-    await new Promise((r) => setTimeout(r, 400));
+    await settled();
 
     const columns = findings.map((f) => f.suggestion.columns.join(","));
     assert.equal(findings.length, 2, `expected both queries reported, got ${columns.join(" | ")}`);
@@ -124,7 +125,7 @@ describe("against a real PostgreSQL", { skip: !enabled }, () => {
     findings.length = 0;
 
     await client.query("UPDATE orders SET total = total WHERE user_id = $1", [1]);
-    await new Promise((r) => setTimeout(r, 250));
+    await settled();
 
     assert.deepEqual(findings, []);
   });
