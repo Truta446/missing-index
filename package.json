@@ -84,13 +84,13 @@
     "lint:fix": "biome lint --write src test"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.8",
-    "@types/node": "^22.10.0",
+    "@biomejs/biome": "2.5.11",
+    "@types/node": "^26.4.0",
     "@types/pg": "^8.21.0",
     "drizzle-orm": "^0.45.2",
     "mysql2": "^3.23.3",
     "pg": "^8.23.0",
     "postgres": "^3.4.9",
-    "typescript": "^5.7.0"
+    "typescript": "^7.0.2"
   }
 }
